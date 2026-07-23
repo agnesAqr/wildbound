@@ -73,3 +73,30 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# ==================================================
+# Wildbound project-specific rules
+# ==================================================
+
+# JetBrains Rider / VS Code local settings
+.idea/
+.vscode/
+*.sln.DotSettings.user
+*.user
+*.userprefs
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Only commit assets created specifically for Wildbound
+/Content/*
+!/Content/Wildbound/
+!/Content/Wildbound/**
+
+# Packaged game output
+/PackagedBuilds/
+/Releases/
+
+# Third-party plugins
