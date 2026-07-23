@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{2AEE0F8D-45CC-3D77-FE90-70891E390C4B}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Wildbound",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
