@@ -1,13 +1,16 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{2AEE0F8D-45CC-3D77-FE90-70891E390C4B}",
+	"EngineAssociation": "{34CE1EDC-47BD-5C29-692C-849FE4C19357}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
 		{
 			"Name": "Wildbound",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
@@ -17,6 +20,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
 		}
 	]
 }
