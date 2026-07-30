@@ -3,14 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameStateBase.h"
+#include "Framework/GameStates/WBGameStateBase.h"
 #include "WBLobbyGameState.generated.h"
 
 UCLASS()
-class WILDBOUND_API AWBLobbyGameState : public AGameStateBase
+class WILDBOUND_API AWBLobbyGameState : public AWBGameStateBase
 {
 	GENERATED_BODY()
-
-protected:
-	virtual void BeginPlay() override;
 };
