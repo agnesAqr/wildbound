@@ -97,7 +97,7 @@ Desktop.ini
 !/Content/Wildbound/**
 
 # Packaged game output
-/PackagedBuilds/
-/Releases/
+/PackagedBuilds
+/Releases
 
 # Third-party plugins

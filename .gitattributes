@@ -1,0 +1,4 @@
+# Windows batch files must keep CRLF line endings.
+# cmd.exe breaks on caret (^) line continuations when the file uses LF only.
+*.bat text eol=crlf
+*.cmd text eol=crlf
