@@ -23,6 +23,7 @@ public:
 	void SetTravelProbe(int32 InValue);
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void CopyProperties(APlayerState* NewPlayerState) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -30,7 +31,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	/** W2 기준 ⑤ 검증용. Travel 후에도 값이 남으면 Seamless Travel과 CopyProperties가 동작한 것이다. */
+	// Test
 	UPROPERTY(Replicated)
 	int32 TravelProbe = 0;
 };

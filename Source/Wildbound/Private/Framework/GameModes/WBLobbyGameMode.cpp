@@ -11,5 +11,4 @@ AWBLobbyGameMode::AWBLobbyGameMode()
 	GameStateClass = AWBLobbyGameState::StaticClass();
 	PlayerStateClass = AWBPlayerState::StaticClass();
 	PlayerControllerClass = AWBPlayerController::StaticClass();
-	bUseSeamlessTravel = true;
 }

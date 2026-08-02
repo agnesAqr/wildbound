@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Wildbound/Wildbound.h"
 
 AWBPlayerState::AWBPlayerState()
 {
@@ -30,6 +31,15 @@ void AWBPlayerState::SetTravelProbe(int32 InValue)
 	}
 }
 
+void AWBPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UE_LOG(LogWildbound, Display,
+		TEXT("[WB][PlayerState][BeginPlay] Player=%s | Role=%d | TravelProbe=%d"),
+		*GetPlayerName(), static_cast<int32>(GetLocalRole()), TravelProbe);
+}
+
 void AWBPlayerState::CopyProperties(APlayerState* NewPlayerState)
 {
 	Super::CopyProperties(NewPlayerState);
@@ -37,6 +47,15 @@ void AWBPlayerState::CopyProperties(APlayerState* NewPlayerState)
 	if (AWBPlayerState* NewWBPlayerState = Cast<AWBPlayerState>(NewPlayerState))
 	{
 		NewWBPlayerState->TravelProbe = TravelProbe;
+
+		UE_LOG(LogWildbound, Warning,
+			TEXT("[WB][PlayerState][CopyProperties] Player=%s | TravelProbe %d 이전됨"),
+			*GetPlayerName(), TravelProbe);
+	}
+	else
+	{
+		UE_LOG(LogWildbound, Error,
+			TEXT("[WB][PlayerState][CopyProperties] 대상이 AWBPlayerState가 아님 — 값 이전 실패"));
 	}
 }
 

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "Framework/GameModes/WBGameModeBase.h"
 #include "WBRaidGameMode.generated.h"
 
 UCLASS()
-class WILDBOUND_API AWBRaidGameMode : public AGameModeBase
+class WILDBOUND_API AWBRaidGameMode : public AWBGameModeBase
 {
 	GENERATED_BODY()
 
