@@ -8,6 +8,7 @@
 #include "WBPlayerState.generated.h"
 
 class UAbilitySystemComponent;
+class UWBAttributeSet;
 
 UCLASS()
 class WILDBOUND_API AWBPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -18,6 +19,8 @@ public:
 	AWBPlayerState();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UWBAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	int32 GetTravelProbe() const { return TravelProbe; }
 	void SetTravelProbe(int32 InValue);
@@ -30,6 +33,9 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWBAttributeSet> AttributeSet;
 
 	// Test
 	UPROPERTY(Replicated)

@@ -3,6 +3,7 @@
 #include "Framework/Player/WBPlayerState.h"
 
 #include "AbilitySystemComponent.h"
+#include "Combat/WBAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "Wildbound/Wildbound.h"
 
@@ -11,6 +12,9 @@ AWBPlayerState::AWBPlayerState()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	// ASC와 같은 액터의 서브오브젝트여야 InitializeComponent가 SpawnedAttributes에 자동 등록한다.
+	AttributeSet = CreateDefaultSubobject<UWBAttributeSet>(TEXT("AttributeSet"));
 
 	SetNetUpdateFrequency(100.0f);
 }
