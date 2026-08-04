@@ -94,6 +94,14 @@ void AWBPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	}
+
+	for (const FWBAbilityInputBinding& Binding : AbilityInputBindings)
+	{
+		if (!Binding.InputAction || !Binding.AbilityTag.IsValid()) continue;
+
+		EnhancedInput->BindAction(Binding.InputAction, ETriggerEvent::Started, this,
+			&AWBPlayerCharacter::Input_ActivateAbilityByTag, Binding.AbilityTag);
+	}
 }
 
 void AWBPlayerCharacter::InitAbilityActorInfoFromPlayerState()
@@ -115,6 +123,9 @@ void AWBPlayerCharacter::InitAbilityActorInfoFromPlayerState()
 	UE_LOG(LogWildbound, Display,
 		TEXT("[WB][PlayerCharacter][InitASC] HasAuthority=%d | Player=%s | Avatar=%s"),
 		HasAuthority() ? 1 : 0, *WBPlayerState->GetPlayerName(), *GetName());
+
+	InitializeDefaultAttributes();
+	GiveDefaultAbilities();
 }
 
 void AWBPlayerCharacter::Input_Move(const FInputActionValue& Value)
@@ -136,4 +147,11 @@ void AWBPlayerCharacter::Input_Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AWBPlayerCharacter::Input_ActivateAbilityByTag(FGameplayTag AbilityTag)
+{
+	if (!AbilitySystemComponent) return;
+
+	AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag));
 }

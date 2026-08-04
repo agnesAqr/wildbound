@@ -8,6 +8,8 @@
 #include "WBCharacterBase.generated.h"
 
 class UAbilitySystemComponent;
+class UGameplayEffect;
+class UWBGameplayAbility;
 
 /** 근접 트레이스 구간을 정의하는 소켓 쌍. 무기 1자루당 항목 1개 */
 USTRUCT(BlueprintType)
@@ -35,8 +37,17 @@ public:
 	const TArray<FWBMeleeSocketPair>& GetMeleeSocketPairs() const { return MeleeSocketPairs; }
 
 protected:
+	void InitializeDefaultAttributes();
+	void GiveDefaultAbilities();
+
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<UGameplayEffect> DefaultAttributesEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<UWBGameplayAbility>> DefaultAbilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee")
 	TArray<FWBMeleeSocketPair> MeleeSocketPairs;

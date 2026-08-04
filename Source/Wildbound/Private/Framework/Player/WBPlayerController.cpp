@@ -2,8 +2,10 @@
 
 #include "Framework/Player/WBPlayerController.h"
 
+#include "Combat/WBAttributeSet.h"
 #include "Engine/World.h"
 #include "Framework/Player/WBPlayerState.h"
+#include "GameFramework/GameStateBase.h"
 #include "Wildbound/Wildbound.h"
 
 namespace WBMapPath
@@ -91,4 +93,34 @@ void AWBPlayerController::WBShowProbe() const
 		WBPlayerState->GetTravelProbe(),
 		HasAuthority() ? 1 : 0,
 		*WBPlayerState->GetPlayerName());
+}
+
+void AWBPlayerController::WBShowAttributes() const
+{
+	const UWorld* World = GetWorld();
+	const AGameStateBase* GameState = World ? World->GetGameState() : nullptr;
+	if (!GameState)
+	{
+		UE_LOG(LogWildbound, Error, TEXT("[WB][PC][Attr] GameState가 없습니다."));
+		return;
+	}
+
+	const APlayerState* SelfPlayerState = GetPlayerState<APlayerState>();
+
+	for (const APlayerState* EachPlayerState : GameState->PlayerArray)
+	{
+		const AWBPlayerState* WBPlayerState = Cast<AWBPlayerState>(EachPlayerState);
+		if (!WBPlayerState) continue;
+
+		const UWBAttributeSet* Attributes = WBPlayerState->GetAttributeSet();
+		if (!Attributes) continue;
+
+		UE_LOG(LogWildbound, Warning,
+			TEXT("[WB][PC][Attr] Authority=%d | Target=%s | bSelf=%d | HP=%.0f/%.0f | SP=%.0f/%.0f"),
+			HasAuthority() ? 1 : 0,
+			*WBPlayerState->GetPlayerName(),
+			EachPlayerState == SelfPlayerState ? 1 : 0,
+			Attributes->GetHealth(), Attributes->GetMaxHealth(),
+			Attributes->GetStamina(), Attributes->GetMaxStamina());
+	}
 }

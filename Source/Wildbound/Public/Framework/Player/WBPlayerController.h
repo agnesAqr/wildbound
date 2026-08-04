@@ -26,6 +26,9 @@ public:
 	UFUNCTION(Exec)
 	void WBShowProbe() const;
 
+	UFUNCTION(Exec)
+	void WBShowAttributes() const;
+
 private:
 	void ServerTravelTo(const FString& MapPath);
 
