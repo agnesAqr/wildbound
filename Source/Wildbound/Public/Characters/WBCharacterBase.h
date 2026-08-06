@@ -9,6 +9,7 @@
 
 class UAbilitySystemComponent;
 class UGameplayEffect;
+class USkeletalMeshComponent;
 class UWBGameplayAbility;
 
 /** 근접 트레이스 구간을 정의하는 소켓 쌍. 무기 1자루당 항목 1개 */
@@ -36,9 +37,17 @@ public:
 
 	const TArray<FWBMeleeSocketPair>& GetMeleeSocketPairs() const { return MeleeSocketPairs; }
 
+	void BeginMeleeTrace(USkeletalMeshComponent* MeshComp, float InTraceRadius, int32 InSampleCount);
+	void TickMeleeTrace(USkeletalMeshComponent* MeshComp);
+	void EndMeleeTrace();
+
 protected:
 	void InitializeDefaultAttributes();
 	void GiveDefaultAbilities();
+
+	virtual void HandleMeleeHit(AActor* HitActor, const FHitResult& Hit);
+
+	void GatherTraceSamples(USkeletalMeshComponent* MeshComp, TArray<FVector>& OutSamples) const;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -51,4 +60,11 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee")
 	TArray<FWBMeleeSocketPair> MeleeSocketPairs;
+
+	UPROPERTY()
+	TSet<TObjectPtr<AActor>> MeleeHitActors;
+
+	TArray<FVector> PreviousTraceSamples;
+	float ActiveTraceRadius = 0.0f;
+	int32 ActiveSampleCount = 0;
 };

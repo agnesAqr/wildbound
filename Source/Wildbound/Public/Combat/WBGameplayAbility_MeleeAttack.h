@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include "Abilities/GameplayAbilityTypes.h"
 #include "CoreMinimal.h"
 #include "Combat/WBGameplayAbility.h"
 #include "WBGameplayAbility_MeleeAttack.generated.h"
 
 class UAnimMontage;
+class UGameplayEffect;
 
 UCLASS()
 class WILDBOUND_API UWBGameplayAbility_MeleeAttack : public UWBGameplayAbility
@@ -25,7 +27,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Melee")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Melee")
+	TSubclassOf<UGameplayEffect> DamageGameplayEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee", meta = (ClampMin = "0.0"))
+	float DamageAmount = 25.0f;
+
 private:
+	UFUNCTION()
+	void OnMeleeHitEvent(FGameplayEventData Payload);
+
 	UFUNCTION()
 	void OnMontageFinished();
 

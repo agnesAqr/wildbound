@@ -3,7 +3,11 @@
 #include "Combat/WBGameplayAbility_MeleeAttack.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "Core/WBGameplayTags.h"
+#include "GameplayEffect.h"
 #include "Wildbound/Wildbound.h"
 
 UWBGameplayAbility_MeleeAttack::UWBGameplayAbility_MeleeAttack()
@@ -36,6 +40,12 @@ void UWBGameplayAbility_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecH
 		return;
 	}
 
+	UAbilityTask_WaitGameplayEvent* HitEventTask =
+		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, WBGameplayTags::Event_Hit_Melee);
+
+	HitEventTask->EventReceived.AddDynamic(this, &UWBGameplayAbility_MeleeAttack::OnMeleeHitEvent);
+	HitEventTask->ReadyForActivation();
+
 	UAbilityTask_PlayMontageAndWait* MontageTask =
 		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, AttackMontage);
 
@@ -49,6 +59,34 @@ void UWBGameplayAbility_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecH
 		ActorInfo->IsNetAuthority() ? 1 : 0,
 		ActorInfo->IsLocallyControlled() ? 1 : 0,
 		*GetNameSafe(ActorInfo->AvatarActor.Get()));
+}
+
+void UWBGameplayAbility_MeleeAttack::OnMeleeHitEvent(FGameplayEventData Payload)
+{
+	if (!CurrentActorInfo || !CurrentActorInfo->IsNetAuthority()) return;
+
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
+	UAbilitySystemComponent* TargetASC =
+		UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Payload.Target.Get());
+
+	if (!SourceASC || !TargetASC || !DamageGameplayEffect)
+	{
+		UE_LOG(LogWildbound, Error,
+			TEXT("[WB][GA_Melee][Damage] 적용 불가 | Target=%s | TargetASC=%d | GE=%d"),
+			*GetNameSafe(Payload.Target.Get()), TargetASC != nullptr, DamageGameplayEffect != nullptr);
+		return;
+	}
+
+	FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	const FGameplayEffectSpecHandle SpecHandle =
+		SourceASC->MakeOutgoingSpec(DamageGameplayEffect, GetAbilityLevel(), EffectContext);
+	if (!SpecHandle.IsValid()) return;
+
+	SpecHandle.Data->SetSetByCallerMagnitude(WBGameplayTags::Data_Damage, -DamageAmount);
+
+	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 }
 
 void UWBGameplayAbility_MeleeAttack::OnMontageFinished()

@@ -4,6 +4,7 @@
 
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+#include "Wildbound/Wildbound.h"
 
 UWBAttributeSet::UWBAttributeSet()
 {
@@ -27,6 +28,18 @@ void UWBAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
+	ClampAttribute(Attribute, NewValue);
+}
+
+void UWBAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
+
+	ClampAttribute(Attribute, NewValue);
+}
+
+void UWBAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const
+{
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
@@ -37,9 +50,29 @@ void UWBAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 	}
 }
 
+void UWBAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	if (Data.EvaluatedData.Attribute != GetHealthAttribute()) return;
+
+	UE_LOG(LogWildbound, Display,
+		TEXT("[WB][Attr][Health] IsServer=%d | Target=%s | Delta=%.1f | HP=%.1f/%.1f | Base=%.1f | Instigator=%s"),
+		Data.Target.IsOwnerActorAuthoritative() ? 1 : 0,
+		*GetNameSafe(Data.Target.GetAvatarActor()),
+		Data.EvaluatedData.Magnitude,
+		GetHealth(), GetMaxHealth(),
+		Data.Target.GetNumericAttributeBase(GetHealthAttribute()),
+		*GetNameSafe(Data.EffectSpec.GetEffectContext().GetOriginalInstigator()));
+}
+
 void UWBAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UWBAttributeSet, Health, OldValue);
+
+	UE_LOG(LogWildbound, Display,
+		TEXT("[WB][Attr][OnRep_Health] Owner=%s | %.1f -> %.1f"),
+		*GetNameSafe(GetOwningActor()), OldValue.GetCurrentValue(), GetHealth());
 }
 
 void UWBAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)

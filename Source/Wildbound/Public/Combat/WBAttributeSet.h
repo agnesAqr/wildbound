@@ -23,6 +23,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital")
 	FGameplayAttributeData Health;
@@ -52,4 +54,7 @@ protected:
 
 	UFUNCTION()
 	void OnRep_MaxStamina(const FGameplayAttributeData& OldValue);
+
+private:
+	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
 };
