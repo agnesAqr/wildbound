@@ -21,9 +21,15 @@ REM       left only 1 GB free while four clients were running.
 REM    3. Desktop at 1920x1080. The window layout below assumes it.
 REM
 REM  ---- NOTES ------------------------------------------------
-REM  -DefaultViewportMouseCaptureMode=NoCapture frees the cursor so
-REM  you can click between the four windows. Remove it from W3 when
-REM  testing mouse-driven combat.
+REM  -DefaultViewportMouseCaptureMode=CaptureDuringMouseDown grabs the
+REM  cursor only while a mouse button is held. Mouse-driven combat works
+REM  and the cursor is still free between swings to move to another
+REM  window. Use NoCapture again if a test needs no gameplay input.
+REM
+REM  timeout /t only works from an interactive console. If this script
+REM  runs with stdin redirected the waits are skipped and all clients
+REM  start at once. Run it from a normal terminal whenever the stagger
+REM  matters - notably the weekly performance measurement.
 REM
 REM  Window position does NOT match join order - clients finish
 REM  loading at different speeds. Identify a player by its log file,
@@ -138,6 +144,6 @@ if "%IDX%"=="3" ( set "X=0" & set "Y=540" )
 if "%IDX%"=="4" ( set "X=960" & set "Y=540" )
 
 echo Launching client %IDX% at %X%,%Y% ...
-start "" "%CLIENT%" %ADDRESS% -windowed -ResX=%RESX% -ResY=%RESY% -WinX=%X% -WinY=%Y% -DefaultViewportMouseCaptureMode=NoCapture -ExecCmds="t.MaxFPS %MAXFPS%" -LOG=WBSmoke-%STAMP%-Client%IDX%.log
+start "" "%CLIENT%" %ADDRESS% -windowed -ResX=%RESX% -ResY=%RESY% -WinX=%X% -WinY=%Y% -DefaultViewportMouseCaptureMode=CaptureDuringMouseDown -ExecCmds="t.MaxFPS %MAXFPS%" -LOG=WBSmoke-%STAMP%-Client%IDX%.log
 timeout /t %CLIENTSTAGGER% /nobreak >nul
 goto :eof
