@@ -46,7 +46,8 @@ private:
 
 	void Input_Move(const FInputActionValue& Value);
 	void Input_Look(const FInputActionValue& Value);
-	void Input_ActivateAbilityByTag(FGameplayTag AbilityTag);
+	void Input_AbilityInputPressed(FGameplayTag AbilityTag);
+	void Input_AbilityInputReleased(FGameplayTag AbilityTag);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;

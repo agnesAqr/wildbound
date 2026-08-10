@@ -15,6 +15,9 @@ namespace WBGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Dead);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Hit_Melee);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Input_AttackPrimary);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combo_WindowBegin);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combo_WindowEnd);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Flesh);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Attack_Primary);

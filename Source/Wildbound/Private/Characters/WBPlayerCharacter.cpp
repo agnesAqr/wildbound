@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Core/WBGameplayTags.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
@@ -100,7 +101,10 @@ void AWBPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		if (!Binding.InputAction || !Binding.AbilityTag.IsValid()) continue;
 
 		EnhancedInput->BindAction(Binding.InputAction, ETriggerEvent::Started, this,
-			&AWBPlayerCharacter::Input_ActivateAbilityByTag, Binding.AbilityTag);
+			&AWBPlayerCharacter::Input_AbilityInputPressed, Binding.AbilityTag);
+
+		EnhancedInput->BindAction(Binding.InputAction, ETriggerEvent::Completed, this,
+			&AWBPlayerCharacter::Input_AbilityInputReleased, Binding.AbilityTag);
 	}
 }
 
@@ -149,9 +153,41 @@ void AWBPlayerCharacter::Input_Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void AWBPlayerCharacter::Input_ActivateAbilityByTag(FGameplayTag AbilityTag)
+void AWBPlayerCharacter::Input_AbilityInputPressed(FGameplayTag AbilityTag)
 {
 	if (!AbilitySystemComponent) return;
 
+	UE_LOG(LogWildbound, Display,
+		TEXT("[WB][Input][Pressed] Tag=%s | Attacking=%d"),
+		*AbilityTag.GetTagName().ToString(),
+		AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Attacking) ? 1 : 0);
+
+	if (AbilityTag == WBGameplayTags::Ability_Attack_Primary &&
+		AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Attacking))
+	{
+		FGameplayEventData Payload;
+		Payload.EventTag = WBGameplayTags::Event_Input_AttackPrimary;
+		Payload.Instigator = this;
+
+		AbilitySystemComponent->HandleGameplayEvent(Payload.EventTag, &Payload);
+		return;
+	}
+
 	AbilitySystemComponent->TryActivateAbilitiesByTag(FGameplayTagContainer(AbilityTag));
+}
+
+void AWBPlayerCharacter::Input_AbilityInputReleased(FGameplayTag AbilityTag)
+{
+	if (!AbilitySystemComponent) return;
+
+	TArray<FGameplayAbilitySpecHandle> Handles;
+	AbilitySystemComponent->FindAllAbilitiesWithTags(Handles, FGameplayTagContainer(AbilityTag));
+
+	for (const FGameplayAbilitySpecHandle& Handle : Handles)
+	{
+		if (FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromHandle(Handle))
+		{
+			AbilitySystemComponent->AbilitySpecInputReleased(*Spec);
+		}
+	}
 }

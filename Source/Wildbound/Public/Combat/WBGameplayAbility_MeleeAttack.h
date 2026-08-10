@@ -30,16 +30,36 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Melee")
 	TSubclassOf<UGameplayEffect> DamageGameplayEffect;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Melee", meta = (ClampMin = "0.0"))
-	float DamageAmount = 25.0f;
+	/** 콤보 순서대로의 몽타주 섹션 이름. 마지막 항목이 콤보 상한이다. */
+	UPROPERTY(EditDefaultsOnly, Category = "Melee|Combo")
+	TArray<FName> ComboSectionNames;
+
+	/** ComboSectionNames와 같은 순서의 타수별 대미지. */
+	UPROPERTY(EditDefaultsOnly, Category = "Melee|Combo", meta = (ClampMin = "0.0"))
+	TArray<float> ComboDamageAmounts;
 
 private:
 	UFUNCTION()
 	void OnMeleeHitEvent(FGameplayEventData Payload);
 
 	UFUNCTION()
+	void OnComboWindowBegin(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void OnComboWindowEnd(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void OnComboInputEvent(FGameplayEventData Payload);
+
+	UFUNCTION()
 	void OnMontageFinished();
 
 	UFUNCTION()
 	void OnMontageAborted();
+
+	int32 GetCurrentComboIndex() const;
+	float GetCurrentComboDamage() const;
+
+	bool bComboWindowOpen = false;
+	bool bComboQueued = false;
 };
