@@ -29,18 +29,23 @@ UAbilitySystemComponent* AWBCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AWBCharacterBase::InitializeDefaultAttributes()
+void AWBCharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass)
 {
-	if (!HasAuthority() || !AbilitySystemComponent || !DefaultAttributesEffect) return;
+	if (!HasAuthority() || !AbilitySystemComponent || !EffectClass) return;
 
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
 	const FGameplayEffectSpecHandle SpecHandle =
-		AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributesEffect, 1.0f, EffectContext);
+		AbilitySystemComponent->MakeOutgoingSpec(EffectClass, 1.0f, EffectContext);
 	if (!SpecHandle.IsValid()) return;
 
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+}
+
+void AWBCharacterBase::InitializeDefaultAttributes()
+{
+	ApplyEffectToSelf(DefaultAttributesEffect);
 }
 
 void AWBCharacterBase::GiveDefaultAbilities()

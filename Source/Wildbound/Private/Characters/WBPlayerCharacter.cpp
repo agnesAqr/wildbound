@@ -2,6 +2,7 @@
 
 #include "Characters/WBPlayerCharacter.h"
 
+#include "Abilities/GameplayAbility.h"
 #include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Core/WBGameplayTags.h"
@@ -129,11 +130,17 @@ void AWBPlayerCharacter::InitAbilityActorInfoFromPlayerState()
 		HasAuthority() ? 1 : 0, *WBPlayerState->GetPlayerName(), *GetName());
 
 	InitializeDefaultAttributes();
+	ApplyEffectToSelf(StaminaRegenEffect);
 	GiveDefaultAbilities();
 }
 
 void AWBPlayerCharacter::Input_Move(const FInputActionValue& Value)
 {
+	if (AbilitySystemComponent &&
+		(AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Charging) ||
+		 AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Dead)))
+		return;
+
 	const AController* MyController = GetController();
 	if (!MyController) return;
 
@@ -162,6 +169,7 @@ void AWBPlayerCharacter::Input_AbilityInputPressed(FGameplayTag AbilityTag)
 		*AbilityTag.GetTagName().ToString(),
 		AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Attacking) ? 1 : 0);
 
+	// Route combo input via GameplayEvent to bypass reactivation block.
 	if (AbilityTag == WBGameplayTags::Ability_Attack_Primary &&
 		AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Attacking))
 	{
@@ -185,9 +193,15 @@ void AWBPlayerCharacter::Input_AbilityInputReleased(FGameplayTag AbilityTag)
 
 	for (const FGameplayAbilitySpecHandle& Handle : Handles)
 	{
-		if (FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromHandle(Handle))
-		{
-			AbilitySystemComponent->AbilitySpecInputReleased(*Spec);
-		}
+		FGameplayAbilitySpec* Spec = AbilitySystemComponent->FindAbilitySpecFromHandle(Handle);
+		if (!Spec || !Spec->IsActive()) continue;
+
+		UGameplayAbility* Instance = Spec->GetPrimaryInstance();
+		if (!Instance) continue;
+
+		AbilitySystemComponent->AbilitySpecInputReleased(*Spec);
+		AbilitySystemComponent->InvokeReplicatedEvent(
+			EAbilityGenericReplicatedEvent::InputReleased, Spec->Handle,
+			Instance->GetCurrentActivationInfoRef().GetActivationPredictionKey());
 	}
 }

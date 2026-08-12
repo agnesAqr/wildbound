@@ -8,12 +8,13 @@
 #include "WBPlayerCharacter.generated.h"
 
 class UCameraComponent;
+class UGameplayEffect;
 class UInputAction;
 class UInputMappingContext;
 class USpringArmComponent;
 struct FInputActionValue;
 
-/** 입력에 따른 어빌리티 태그 구조체 */
+/** Maps an input action to the ability tag it activates. */
 USTRUCT(BlueprintType)
 struct FWBAbilityInputBinding
 {
@@ -54,6 +55,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UGameplayEffect> StaminaRegenEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;

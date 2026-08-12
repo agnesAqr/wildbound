@@ -12,7 +12,7 @@ class UGameplayEffect;
 class USkeletalMeshComponent;
 class UWBGameplayAbility;
 
-/** 근접 트레이스 구간을 정의하는 소켓 쌍. 무기 1자루당 항목 1개 */
+/** Socket pair defining one melee trace span. One entry per weapon. */
 USTRUCT(BlueprintType)
 struct FWBMeleeSocketPair
 {
@@ -42,6 +42,7 @@ public:
 	void EndMeleeTrace();
 
 protected:
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& EffectClass);
 	void InitializeDefaultAttributes();
 	void GiveDefaultAbilities();
 
