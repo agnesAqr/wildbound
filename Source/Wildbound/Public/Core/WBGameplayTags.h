@@ -11,6 +11,8 @@ namespace WBGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Ability_Dodge);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Combat_Attacking);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Combat_Charging);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Combat_Dodging);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Combat_Invulnerable);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(State_Dead);
 
@@ -18,6 +20,7 @@ namespace WBGameplayTags
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Input_AttackPrimary);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combo_WindowBegin);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_Combo_WindowEnd);
+	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Event_State_Down);
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(GameplayCue_Hit_Flesh);
 
 	UE_DECLARE_GAMEPLAY_TAG_EXTERN(Cooldown_Attack_Primary);

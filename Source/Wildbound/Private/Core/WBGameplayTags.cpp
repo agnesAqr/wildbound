@@ -9,6 +9,8 @@ namespace WBGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Ability_Dodge, "Ability.Dodge");
 
 	UE_DEFINE_GAMEPLAY_TAG(State_Combat_Attacking, "State.Combat.Attacking");
+	UE_DEFINE_GAMEPLAY_TAG(State_Combat_Charging, "State.Combat.Charging");
+	UE_DEFINE_GAMEPLAY_TAG(State_Combat_Dodging, "State.Combat.Dodging");
 	UE_DEFINE_GAMEPLAY_TAG(State_Combat_Invulnerable, "State.Combat.Invulnerable");
 	UE_DEFINE_GAMEPLAY_TAG(State_Dead, "State.Dead");
 
@@ -16,6 +18,7 @@ namespace WBGameplayTags
 	UE_DEFINE_GAMEPLAY_TAG(Event_Input_AttackPrimary, "Event.Input.AttackPrimary");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Combo_WindowBegin, "Event.Combo.WindowBegin");
 	UE_DEFINE_GAMEPLAY_TAG(Event_Combo_WindowEnd, "Event.Combo.WindowEnd");
+	UE_DEFINE_GAMEPLAY_TAG(Event_State_Down, "Event.State.Down");
 	UE_DEFINE_GAMEPLAY_TAG(GameplayCue_Hit_Flesh, "GameplayCue.Hit.Flesh");
 
 	UE_DEFINE_GAMEPLAY_TAG(Cooldown_Attack_Primary, "Cooldown.Attack.Primary");
