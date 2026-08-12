@@ -2,6 +2,7 @@
 
 #include "Combat/WBAttributeSet.h"
 
+#include "Core/WBGameplayTags.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 #include "Wildbound/Wildbound.h"
@@ -64,6 +65,17 @@ void UWBAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		GetHealth(), GetMaxHealth(),
 		Data.Target.GetNumericAttributeBase(GetHealthAttribute()),
 		*GetNameSafe(Data.EffectSpec.GetEffectContext().GetOriginalInstigator()));
+
+	if (!Data.Target.IsOwnerActorAuthoritative()) return;
+	if (GetHealth() > 0.0f) return;
+	if (Data.Target.HasMatchingGameplayTag(WBGameplayTags::State_Dead)) return;
+
+	FGameplayEventData Payload;
+	Payload.EventTag = WBGameplayTags::Event_State_Down;
+	Payload.Instigator = Data.EffectSpec.GetEffectContext().GetOriginalInstigator();
+	Payload.Target = Data.Target.GetAvatarActor();
+
+	Data.Target.HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
 void UWBAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)

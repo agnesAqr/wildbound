@@ -12,7 +12,7 @@ class WILDBOUND_API AWBPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	/* 검증용 임시 exec 커맨드 */
+	/* Temporary exec commands for verification */
 
 	UFUNCTION(Exec)
 	void WBTravelRaid();
@@ -29,6 +29,9 @@ public:
 	UFUNCTION(Exec)
 	void WBShowAttributes() const;
 
+	UFUNCTION(Exec)
+	void WBGodMode();
+
 private:
 	void ServerTravelTo(const FString& MapPath);
 
@@ -37,4 +40,9 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SetProbe(int32 NewValue);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetGodMode();
+
+	bool bGodMode = false;
 };

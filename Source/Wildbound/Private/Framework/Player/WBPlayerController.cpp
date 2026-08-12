@@ -2,9 +2,14 @@
 
 #include "Framework/Player/WBPlayerController.h"
 
+#include "AbilitySystemComponent.h"
+#include "Animation/AnimInstance.h"
 #include "Combat/WBAttributeSet.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Core/WBGameplayTags.h"
 #include "Engine/World.h"
 #include "Framework/Player/WBPlayerState.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/GameStateBase.h"
 #include "Wildbound/Wildbound.h"
 
@@ -12,6 +17,17 @@ namespace WBMapPath
 {
 	static const TCHAR* Lobby = TEXT("/Game/Wildbound/Maps/L_Lobby");
 	static const TCHAR* Raid  = TEXT("/Game/Wildbound/Maps/L_Raid");
+}
+
+static FName GetActiveMontageSection(const APawn* Pawn)
+{
+	const ACharacter* Character = Cast<ACharacter>(Pawn);
+	const USkeletalMeshComponent* Mesh = Character ? Character->GetMesh() : nullptr;
+	const UAnimInstance* AnimInstance = Mesh ? Mesh->GetAnimInstance() : nullptr;
+	if (!AnimInstance) return NAME_None;
+
+	const UAnimMontage* ActiveMontage = AnimInstance->GetCurrentActiveMontage();
+	return ActiveMontage ? AnimInstance->Montage_GetCurrentSection(ActiveMontage) : NAME_None;
 }
 
 void AWBPlayerController::WBTravelRaid()
@@ -115,12 +131,57 @@ void AWBPlayerController::WBShowAttributes() const
 		const UWBAttributeSet* Attributes = WBPlayerState->GetAttributeSet();
 		if (!Attributes) continue;
 
+		const UAbilitySystemComponent* ASC = WBPlayerState->GetAbilitySystemComponent();
+		const FString OwnedTags = ASC ? ASC->GetOwnedGameplayTags().ToStringSimple() : FString(TEXT("-"));
+
 		UE_LOG(LogWildbound, Warning,
-			TEXT("[WB][PC][Attr] Authority=%d | Target=%s | bSelf=%d | HP=%.0f/%.0f | SP=%.0f/%.0f"),
+			TEXT("[WB][PC][Attr] Authority=%d | Target=%s | bSelf=%d | HP=%.0f/%.0f | SP=%.0f/%.0f | Section=%s | Tags=%s"),
 			HasAuthority() ? 1 : 0,
 			*WBPlayerState->GetPlayerName(),
 			EachPlayerState == SelfPlayerState ? 1 : 0,
 			Attributes->GetHealth(), Attributes->GetMaxHealth(),
-			Attributes->GetStamina(), Attributes->GetMaxStamina());
+			Attributes->GetStamina(), Attributes->GetMaxStamina(),
+			*GetActiveMontageSection(WBPlayerState->GetPawn()).ToString(),
+			*OwnedTags);
 	}
+}
+
+void AWBPlayerController::WBGodMode()
+{
+	if (!HasAuthority())
+	{
+		Server_SetGodMode();
+		return;
+	}
+
+	Server_SetGodMode_Implementation();
+}
+
+void AWBPlayerController::Server_SetGodMode_Implementation()
+{
+	AWBPlayerState* WBPlayerState = GetPlayerState<AWBPlayerState>();
+	UAbilitySystemComponent* ASC =
+		WBPlayerState ? WBPlayerState->GetAbilitySystemComponent() : nullptr;
+	if (!ASC)
+	{
+		UE_LOG(LogWildbound, Error, TEXT("[WB][PC][God] PlayerState 또는 ASC가 없습니다."));
+		return;
+	}
+
+	bGodMode = !bGodMode;
+
+	if (bGodMode)
+	{
+		ASC->AddLooseGameplayTag(WBGameplayTags::State_Combat_Invulnerable);
+	}
+	else
+	{
+		ASC->RemoveLooseGameplayTag(WBGameplayTags::State_Combat_Invulnerable);
+	}
+
+	UE_LOG(LogWildbound, Warning,
+		TEXT("[WB][PC][God] %s | Player=%s | Count=%d"),
+		bGodMode ? TEXT("ON") : TEXT("OFF"),
+		*WBPlayerState->GetPlayerName(),
+		ASC->GetGameplayTagCount(WBGameplayTags::State_Combat_Invulnerable));
 }
