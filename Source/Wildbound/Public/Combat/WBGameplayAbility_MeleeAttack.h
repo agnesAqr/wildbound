@@ -10,6 +10,18 @@
 class UAnimMontage;
 class UGameplayEffect;
 
+USTRUCT(BlueprintType)
+struct FWBMeleeComboStep
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo")
+	FName SectionName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo", meta = (ClampMin = "0.0"))
+	float DamageAmount = 25.0f;
+};
+
 UCLASS()
 class WILDBOUND_API UWBGameplayAbility_MeleeAttack : public UWBGameplayAbility
 {
@@ -30,13 +42,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Melee")
 	TSubclassOf<UGameplayEffect> DamageGameplayEffect;
 
-	/** 콤보 순서대로의 몽타주 섹션 이름. 마지막 항목이 콤보 상한이다. */
+	/** Combo step data in hit order. */
 	UPROPERTY(EditDefaultsOnly, Category = "Melee|Combo")
-	TArray<FName> ComboSectionNames;
-
-	/** ComboSectionNames와 같은 순서의 타수별 대미지. */
-	UPROPERTY(EditDefaultsOnly, Category = "Melee|Combo", meta = (ClampMin = "0.0"))
-	TArray<float> ComboDamageAmounts;
+	TArray<FWBMeleeComboStep> ComboSteps;
 
 private:
 	UFUNCTION()

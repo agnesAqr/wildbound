@@ -20,8 +20,10 @@ UWBGameplayAbility_MeleeAttack::UWBGameplayAbility_MeleeAttack()
 	ActivationOwnedTags.AddTag(WBGameplayTags::State_Combat_Attacking);
 	ActivationBlockedTags.AddTag(WBGameplayTags::State_Combat_Attacking);
 
-	ComboSectionNames = { TEXT("Combo1"), TEXT("Combo2"), TEXT("Combo3"), TEXT("Combo4") };
-	ComboDamageAmounts = { 25.0f, 25.0f, 30.0f, 40.0f };
+	ComboSteps.Add({ TEXT("Combo1"), 25.0f });
+	ComboSteps.Add({ TEXT("Combo2"), 25.0f });
+	ComboSteps.Add({ TEXT("Combo3"), 30.0f });
+	ComboSteps.Add({ TEXT("Combo4"), 40.0f });
 }
 
 void UWBGameplayAbility_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
@@ -29,7 +31,7 @@ void UWBGameplayAbility_MeleeAttack::ActivateAbility(const FGameplayAbilitySpecH
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-	// Super 호출x — 네이티브 경로에선 아무 일도 하지 않고, BP 로직이 추가되면 이중 실행된다.
+	// No Super call — it is a no-op on the native path, and would commit twice once BP logic is added.
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
@@ -127,20 +129,20 @@ void UWBGameplayAbility_MeleeAttack::OnComboInputEvent(FGameplayEventData Payloa
 	if (!bComboWindowOpen || bComboQueued) return;
 
 	const int32 ComboIndex = GetCurrentComboIndex();
-	if (ComboIndex == INDEX_NONE || !ComboSectionNames.IsValidIndex(ComboIndex + 1)) return;
+	if (ComboIndex == INDEX_NONE || !ComboSteps.IsValidIndex(ComboIndex + 1)) return;
 
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo();
 	if (!SourceASC) return;
 
 	SourceASC->CurrentMontageSetNextSectionName(
-		ComboSectionNames[ComboIndex], ComboSectionNames[ComboIndex + 1]);
+		ComboSteps[ComboIndex].SectionName, ComboSteps[ComboIndex + 1].SectionName);
 	bComboQueued = true;
 
 	UE_LOG(LogWildbound, Display,
 		TEXT("[WB][GA_Melee][Combo] 예약 | IsServer=%d | %s -> %s"),
 		CurrentActorInfo && CurrentActorInfo->IsNetAuthority() ? 1 : 0,
-		*ComboSectionNames[ComboIndex].ToString(),
-		*ComboSectionNames[ComboIndex + 1].ToString());
+		*ComboSteps[ComboIndex].SectionName.ToString(),
+		*ComboSteps[ComboIndex + 1].SectionName.ToString());
 }
 
 int32 UWBGameplayAbility_MeleeAttack::GetCurrentComboIndex() const
@@ -148,20 +150,23 @@ int32 UWBGameplayAbility_MeleeAttack::GetCurrentComboIndex() const
 	UAnimInstance* AnimInstance = CurrentActorInfo ? CurrentActorInfo->GetAnimInstance() : nullptr;
 	if (!AnimInstance || !AttackMontage) return INDEX_NONE;
 
-	return ComboSectionNames.IndexOfByKey(AnimInstance->Montage_GetCurrentSection(AttackMontage));
+	const FName CurrentSection = AnimInstance->Montage_GetCurrentSection(AttackMontage);
+
+	return ComboSteps.IndexOfByPredicate(
+		[CurrentSection](const FWBMeleeComboStep& Step) { return Step.SectionName == CurrentSection; });
 }
 
 float UWBGameplayAbility_MeleeAttack::GetCurrentComboDamage() const
 {
 	const int32 ComboIndex = GetCurrentComboIndex();
-	if (ComboDamageAmounts.IsValidIndex(ComboIndex))
+	if (ComboSteps.IsValidIndex(ComboIndex))
 	{
-		return ComboDamageAmounts[ComboIndex];
+		return ComboSteps[ComboIndex].DamageAmount;
 	}
 
 	UE_LOG(LogWildbound, Warning,
-		TEXT("[WB][GA_Melee][Damage] 타수 판독 실패 | Index=%d | 대미지 배열 길이=%d"),
-		ComboIndex, ComboDamageAmounts.Num());
+		TEXT("[WB][GA_Melee][Damage] 타수 판독 실패 | Index=%d | 콤보 단계 수=%d"),
+		ComboIndex, ComboSteps.Num());
 
 	return 0.0f;
 }
