@@ -13,10 +13,10 @@ class WILDBOUND_API AWBGameStateBase : public AGameStateBase
 
 public:
 	/**
-	 * 접속 인원은 복제 상태이므로 GameState가 보고한다.
-	 * PlayerArray가 실제로 바뀐 직후에 세야 정확하다 — AGameModeBase::Logout 시점에는
-	 * 나가는 PlayerState가 아직 배열에 남아 있어 1이 크게 나온다.
-	 * 서버뿐 아니라 각 클라이언트에서도 호출되므로 로그에 실행 컨텍스트를 함께 남긴다.
+	 * The head count is replicated state, so GameState is what reports it.
+	 * It is only accurate when counted right after PlayerArray actually changes — at
+	 * AGameModeBase::Logout the leaving PlayerState is still in the array and the count reads one too high.
+	 * These are called on every client as well as the server, so the log carries its execution context.
 	 */
 	virtual void AddPlayerState(APlayerState* PlayerState) override;
 	virtual void RemovePlayerState(APlayerState* PlayerState) override;

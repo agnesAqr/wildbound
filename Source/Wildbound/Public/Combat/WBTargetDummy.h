@@ -38,7 +38,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UWBAttributeSet> AttributeSet;
 
-	/** 스폰 직후 서버에서 적용할 초기 수치 GE — 미지정 시 생성자 기본값 100이 그대로 남는다 */
 	UPROPERTY(EditDefaultsOnly, Category = "Wildbound|Dummy")
 	TSubclassOf<UGameplayEffect> DefaultAttributesEffect;
 };

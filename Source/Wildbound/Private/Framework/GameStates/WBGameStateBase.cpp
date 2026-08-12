@@ -47,7 +47,7 @@ void AWBGameStateBase::RemovePlayerState(APlayerState* PlayerState)
 
 void AWBGameStateBase::LogPlayerRoster(const TCHAR* Event, const APlayerState* PlayerState) const
 {
-	// 접속 직후에는 아직 이름이 복제되지 않아 비어 있을 수 있다.
+	// Right after a join the name may not have replicated yet, so it can be empty.
 	const FString PlayerName = PlayerState ? PlayerState->GetPlayerName() : TEXT("Unknown");
 	const FString ContextName = ToString(GetNetMode()).Replace(TEXT(" "), TEXT(""));
 

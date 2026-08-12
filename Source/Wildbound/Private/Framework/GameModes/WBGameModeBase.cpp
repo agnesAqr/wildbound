@@ -29,11 +29,6 @@ void AWBGameModeBase::PostSeamlessTravel()
 		*GetClass()->GetName());
 }
 
-/**
- * 서버가 접속 종료를 판정한 사건만 기록한다. 인원수는 GameState가 보고한다.
- * Seamless Travel에서도 PlayerState는 재생성되므로 GameState의 Roster 로그만으로는
- * 실제 이탈과 트래블을 구분할 수 없다 — 이 로그가 그 구분점이다.
- */
 void AWBGameModeBase::Logout(AController* Exiting)
 {
 	const APlayerState* ExitingPS = Exiting ? Exiting->PlayerState : nullptr;

@@ -13,7 +13,7 @@ AWBPlayerState::AWBPlayerState()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	// ASC와 같은 액터의 서브오브젝트여야 InitializeComponent가 SpawnedAttributes에 자동 등록한다.
+	// Must be a subobject of the same actor as the ASC, or InitializeComponent will not auto-register it into SpawnedAttributes.
 	AttributeSet = CreateDefaultSubobject<UWBAttributeSet>(TEXT("AttributeSet"));
 
 	SetNetUpdateFrequency(100.0f);

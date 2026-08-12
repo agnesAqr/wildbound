@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "WBGameModeBase.generated.h"
 
-// Lobby·Raid GameMode의 공통 부모. 판정·규칙은 파생 클래스에, 복제 상태는 GameState에 둔다.
+// Shared parent of the Lobby and Raid game modes. Rules live in the derived classes, replicated state in GameState.
 UCLASS()
 class WILDBOUND_API AWBGameModeBase : public AGameModeBase
 {
