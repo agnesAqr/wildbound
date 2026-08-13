@@ -93,7 +93,7 @@ void AWBPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	if (JumpAction)
 	{
-		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Started, this, &AWBPlayerCharacter::Input_Jump);
 		EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 	}
 
@@ -134,12 +134,16 @@ void AWBPlayerCharacter::InitAbilityActorInfoFromPlayerState()
 	GiveDefaultAbilities();
 }
 
+bool AWBPlayerCharacter::IsLocomotionLocked() const
+{
+	return AbilitySystemComponent &&
+		(AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Charging) ||
+		 AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Dead));
+}
+
 void AWBPlayerCharacter::Input_Move(const FInputActionValue& Value)
 {
-	if (AbilitySystemComponent &&
-		(AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Combat_Charging) ||
-		 AbilitySystemComponent->HasMatchingGameplayTag(WBGameplayTags::State_Dead)))
-		return;
+	if (IsLocomotionLocked()) return;
 
 	const AController* MyController = GetController();
 	if (!MyController) return;
@@ -158,6 +162,13 @@ void AWBPlayerCharacter::Input_Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
+}
+
+void AWBPlayerCharacter::Input_Jump()
+{
+	if (IsLocomotionLocked()) return;
+
+	Jump();
 }
 
 void AWBPlayerCharacter::Input_AbilityInputPressed(FGameplayTag AbilityTag)

@@ -45,8 +45,11 @@ protected:
 private:
 	void InitAbilityActorInfoFromPlayerState();
 
+	bool IsLocomotionLocked() const;
+
 	void Input_Move(const FInputActionValue& Value);
 	void Input_Look(const FInputActionValue& Value);
+	void Input_Jump();
 	void Input_AbilityInputPressed(FGameplayTag AbilityTag);
 	void Input_AbilityInputReleased(FGameplayTag AbilityTag);
 
