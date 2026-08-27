@@ -1,54 +1,35 @@
-# GitHub Markdown Render Probe
+# GitHub Markdown Render Probe v2
 
-GitHub이 저장소 마크다운 파일(README 등)을 렌더링할 때 어떤 태그/패턴이 살아남는지
-실측하기 위한 파일입니다. 결과는 `FEASIBILITY.md`에 정리되어 있습니다.
+각 줄은 `[[ 마커 ]]` 사이에 HTML을 넣어, GitHub 렌더링 후 무엇이 남는지 측정합니다.
 
-## 0. Control (대조군)
+L1 iframe: [[ <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" width="560" height="315">AAA_IFRAME_INNER</iframe> ]] end-L1
 
-CONTROL_LINK_START [normal-link-survives](https://example.com/control) CONTROL_LINK_END
+L2 external-video: [[ <video src="https://example.com/sample.mp4" controls>BBB_EXTVIDEO_INNER</video> ]] end-L2
 
-## 1. YouTube iframe (표준 임베드)
+L3 embed: [[ <embed src="https://example.com/a.mp4"> ]] end-L3
 
-IFRAME_START<iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allowfullscreen>IFRAME_INNER_TEXT</iframe>IFRAME_END
+L4 object: [[ <object data="https://example.com/a.mp4">CCC_OBJECT_INNER</object> ]] end-L4
 
-## 2. 외부 호스팅 video 태그
+L5 audio: [[ <audio src="https://example.com/a.mp3" controls>DDD_AUDIO_INNER</audio> ]] end-L5
 
-EXTVIDEO_START<video src="https://example.com/sample.mp4" controls width="480">EXTVIDEO_INNER_TEXT</video>EXTVIDEO_END
+L6 script: [[ <script>var EEE_SCRIPT_INNER=1;</script> ]] end-L6
 
-## 3. GitHub 첨부 자산 URL (bare autolink)
+L7 style: [[ <style>body{color:red}</style> ]] end-L7
 
-아래 줄은 GitHub 업로드 자산 형식의 URL 단독 줄입니다.
+L8 control-link: [[ [FFF_CONTROL_LINK](https://example.com/control) ]] end-L8
 
-https://github.com/user-attachments/assets/00000000-1111-2222-3333-444444444444
+L9 github-hosted video tag:
 
-## 4. GitHub 첨부 자산 + video 태그
+<video src="https://github.com/user-attachments/assets/5cab4668-e8e2-4982-8551-aab05ff73a7f" controls width="480">GGG_VIDEOTAG_INNER</video>
 
-VIDEOTAG_START<video src="https://github.com/user-attachments/assets/00000000-1111-2222-3333-444444444444" controls>VIDEOTAG_INNER_TEXT</video>VIDEOTAG_END
+L10 github-hosted bare url:
 
-## 5. embed / object / audio
+https://github.com/user-attachments/assets/5cab4668-e8e2-4982-8551-aab05ff73a7f
 
-EMBED_START<embed src="https://example.com/a.mp4">EMBED_END
-OBJECT_START<object data="https://example.com/a.mp4">OBJECT_INNER_TEXT</object>OBJECT_END
-AUDIO_START<audio src="https://example.com/a.mp3" controls>AUDIO_INNER_TEXT</audio>AUDIO_END
+L11 youtube thumbnail link:
 
-## 6. script / style
+[![thumb](https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
 
-SCRIPT_START<script>var SCRIPT_INNER_TEXT=1;</script>SCRIPT_END
-STYLE_START<style>body{color:red}</style>STYLE_END
+L12 animated svg via camo:
 
-## 7. 썸네일 링크 패턴 (현재 사실상 표준)
-
-[![YouTube thumbnail](https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
-
-## 8. 외부 동적 SVG (camo 프록시 경유)
-
-![typing svg](https://readme-typing-svg.demolab.com/?lines=animated+svg+works+on+github)
-
-## 9. details 접기 + 이미지
-
-<details>
-<summary>DETAILS_SUMMARY_TEXT</summary>
-
-DETAILS_BODY_TEXT
-
-</details>
+![typing svg](https://readme-typing-svg.demolab.com/?lines=animated+svg+works)
